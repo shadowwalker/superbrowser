@@ -1,17 +1,21 @@
 {
-  "name": "browser",
-  "module": "index.ts",
+  "name": "superbrowser",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
+  "dependencies": {
+    "@browserbasehq/stagehand": "^4.1.0",
+    "dotenv": "^17.4.2",
+    "zod": "^4.6.2"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^7"
   },
-  "dependencies": {
-    "@browserbasehq/stagehand": "^4.1.0",
-    "dotenv": "^17.4.2",
-    "zod": "^4.6.2"
+  "packageManager": "bun@1.4.2",
+  "engines": {
+    "bun": ">=1.4.2"
   }
 }
