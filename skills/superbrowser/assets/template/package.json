@@ -1,0 +1,19 @@
+{
+  "name": "superbrowser-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@browserbasehq/stagehand": "4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "typescript": "~7.0.2"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
