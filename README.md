@@ -1,4 +1,4 @@
-![Superbrowser: persistent authentication across runs, deterministic scripts mixed with AI through Stagehand, and the full Explore, Script, Maintain lifecycle.](https://github.com/shadowwalker/superbrowser/blob/main/docs/assets/superbrowser-hero.png?raw=true)
+![Superbrowser: persistent authentication across runs, deterministic scripts mixed with AI through Stagehand, and the full Explore, Script, Maintain lifecycle.](https://github.com/shadowwalker/superbrowser/blob/main/assets/superbrowser-hero.png?raw=true)
 
 # Superbrowser
 
