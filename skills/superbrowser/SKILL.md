@@ -5,11 +5,11 @@ description: Explore websites and build, run, schedule, or repair browser automa
 
 # Superbrowser
 
-Use one persistent Chrome Dev browser through local CDP. Chrome runs separately from automation scripts. Support macOS, TypeScript, Bun or compiled Node, and sequential browser sessions.
+Use one persistent Chrome Dev browser through local CDP. The shared connection utility starts Chrome Dev when needed and waits for readiness; Chrome then outlives automation scripts. Support macOS, TypeScript, Bun or compiled Node, and sequential browser sessions.
 
 ## Enter the workspace
 
-This skill works from any starting directory. Resolve the installed skill directory from this SKILL.md, not the agent's current working directory. On first use or when prerequisites, workspace files, or CDP are missing, follow [references/setup.md](references/setup.md).
+This skill works from any starting directory. Resolve the installed skill directory from this SKILL.md, not the agent's current working directory. On first use, missing prerequisites or workspace files, or failed automatic browser startup, follow [references/setup.md](references/setup.md). A stopped Chrome Dev alone needs no manual setup: connect through the shared utility.
 
 Keep the user's automations in `~/.superbrowser`. Read its AGENTS.md explicitly, even if the agent started elsewhere and did not load it automatically. Read the root README index and the relevant script README before changing an existing workflow. The bundled template is self-contained; no source-repository checkout or particular agent plugin is required.
 
@@ -27,4 +27,4 @@ For repeated or unattended runs, follow [references/operations.md](references/op
 
 When a run fails, read its README, latest status, step logs, and available page evidence. Resolve authentication or browser setup first. For a website change, re-explore the affected step, update the script, and verify the correction. Before replaying a write, determine whether the previous attempt already succeeded. Stop repeated repair attempts when the cause or outcome remains unclear.
 
-Run one automation or exploration session at a time against the shared browser. The shared runner releases its Stagehand session and exits its standalone process. Scripts must not launch Chrome, close the browser, or remove its profile.
+Run one automation or exploration session at a time against the shared browser. Use `runScript` or `connectBrowser` so automatic startup stays in the shared utility. It uses macOS Launch Services, the persistent profile, and the required CDP and extension flags, then waits up to 20 seconds. The shared runner releases its Stagehand session and exits its standalone process. Keep custom launch code out of workflows; never close the browser or remove its profile.

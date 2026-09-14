@@ -1,6 +1,6 @@
 # Set up Superbrowser on macOS
 
-Use on first use, for missing prerequisites or CDP, and when upgrading the workspace. Resolve paths independently of the agent's current directory. This version supports macOS; the agent needs filesystem, shell, and network access. Chrome DevTools MCP is optional.
+Use on first use, for missing prerequisites, failed automatic browser startup, and when upgrading the workspace. Resolve paths independently of the agent's current directory. This version supports macOS; the agent needs filesystem, shell, and network access. Chrome DevTools MCP is optional.
 
 ## Prerequisites
 
@@ -51,15 +51,17 @@ cd "$superbrowser_workspace"
 
 The recursive copy adds missing files and preserves existing ones. Inspect existing files before merging updates. Merge dependencies, build commands, and compiler settings rather than replacing user customization. Preserve script configs, outputs, credentials, lockfiles, and README entries. The template omits packageManager so it works with the selected package manager.
 
+For the automatic-startup update, merge `utils/chrome.ts`, `utils/browser.ts`, and `utils/run.ts` together. Update the workspace AGENTS.md and README to say the shared connection utility starts a stopped Chrome Dev automatically. Rebuild compiled Node output; copying only missing files leaves the old attach-only connection code in place.
+
 For an existing v3 or flat workspace, back up its source, documentation, configuration, package files, and lockfile before migration. Move common helpers into utils and each script into scripts/<name>; bring its notes, config, and exploration files with it. Update imports, configuration paths, the root README index, and affected README commands. Migrate v3 synchronous page lookups and direct result shapes to v4. Rebuild dist from source and validate existing workflows before retiring old entrypoints. Keep the backup outside active compiler inputs.
 
 Run the selected dependency installer in the workspace. The template pins Stagehand 4.1.0. Read the workspace AGENTS.md explicitly. If an agent started elsewhere, use absolute file paths or set command working directories; do not create another dependency installation in that starting directory.
 
 ## Start or reuse Chrome Dev
 
-The default CDP origin is `http://127.0.0.1:9222`; SUPER_BROWSER_CDP_URL can select another local HTTP origin. Probe `<origin>/json/version`. Confirm that a responding process is Chrome Dev using the intended profile and flags. An unrelated browser on the port is not the shared browser.
+The default CDP origin is `http://127.0.0.1:9222`; SUPER_BROWSER_CDP_URL can select another local HTTP origin. `runScript` and `connectBrowser` probe `<origin>/json/version` and reuse a healthy browser. When CDP is unavailable, the shared utility creates the profile directory if needed, starts Chrome Dev once through `/usr/bin/open`, and polls readiness for up to 20 seconds before attaching Stagehand. The runner records `browser_starting` and `browser_ready`. A stopped browser is handled automatically in both manual and scheduled runs.
 
-For the default port:
+The launch uses the port from SUPER_BROWSER_CDP_URL, the absolute SUPER_BROWSER_DATA_DIR or `~/.agents/browsers/default`, and the flags below. Launch Services keeps Chrome independent of the script process, with its previous session restored. For manual setup diagnosis on the default port, the equivalent command is:
 
 ```sh
 superbrowser_data_dir="${SUPER_BROWSER_DATA_DIR:-$HOME/.agents/browsers/default}"
@@ -69,14 +71,15 @@ open -a "Google Chrome Dev" --args \
   --remote-allow-origins="*" \
   --enable-unsafe-extension-debugging \
   --no-first-run \
+  --restore-last-session \
   --user-data-dir="$superbrowser_data_dir"
 ```
 
-Set SUPER_BROWSER_DATA_DIR to an absolute path before launch to override the profile. Set the launch port to match a custom CDP origin. Keep CDP on loopback. Launch Services keeps Chrome independent of the agent shell; ordinary scripts only attach.
+Set SUPER_BROWSER_DATA_DIR to an absolute path before running a script to override the profile. Keep CDP on loopback. When diagnosing an existing endpoint, confirm that its process is Chrome Dev using the intended profile and flags; an unrelated browser on the port is not the shared browser.
 
 Reuse an already healthy process. `open` does not apply new flags to an existing browser. If a running profile lacks the v4 extension flag, preserve its tabs and work, explain the required restart, and restart it with the same profile and `--restore-last-session`. Wait for the old Chrome process to exit fully before calling open; otherwise Launch Services can send the new launch request to the closing process. If unsaved work makes the restart uncertain, hand that step to the user. Never remove the profile to fix a connection.
 
-Poll CDP for up to 20 seconds, then inspect the process and flags on failure. The bundled utility uses Chrome's Extensions CDP commands to load and reuse the installed Stagehand extension. Upgrade Chrome Dev if those commands are unavailable. An SDK upgrade may require refreshing its extension; test sequential reconnects afterward. [V4 browser configuration](https://docs.stagehand.dev/v4/configuration/browser).
+If automatic startup fails or times out, the runner exits 69 with `browser_unavailable` and a setup diagnostic. Check installation, the logged-in macOS session, port, profile, and process flags. The utility does not kill or restart an existing browser. The bundled utility uses Chrome's Extensions CDP commands to load and reuse the installed Stagehand extension. Upgrade Chrome Dev if those commands are unavailable. An SDK upgrade may require refreshing its extension; test sequential reconnects afterward. [V4 browser configuration](https://docs.stagehand.dev/v4/configuration/browser).
 
 ## Verify before exploring
 

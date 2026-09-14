@@ -20,4 +20,4 @@ The script reuses a tab with the exact URL or creates one. It checks for a visib
 
 ## Operations and repair
 
-There is no installed schedule. See `logs/latest.json` for the latest result and the referenced run directory for step events. `browser_unavailable` means setup or Chrome flags need attention. A failure in `verify-page` may reflect page readiness, connectivity, or changed content. Inspect that page and its captured evidence before changing the script. Preserve the original connection-and-reuse goal.
+There is no installed schedule. See `logs/latest.json` for the latest result and the referenced run directory for step events. The shared utility starts a stopped Chrome Dev automatically and waits up to 20 seconds for CDP readiness. `browser_unavailable` means automatic startup or connection failed and setup or Chrome flags need attention. A failure in `verify-page` may reflect page readiness, connectivity, or changed content. Inspect that page and its captured evidence before changing the script. Preserve the original connection-and-reuse goal.

@@ -34,7 +34,7 @@ Use meaningful step names and explicit postconditions. Return the verified resul
 
 ## Browser connection and APIs
 
-The runner calls `localBrowser.connect({ cdpUrl, extensionId })` then `Stagehand.create({ browser })`. The connection utility loads the installed extension if needed and reuses its ID afterward. This avoids reloading the extension on every sequential attachment. Chrome must have `--enable-unsafe-extension-debugging`. The HTTP CDP origin remains stable; the utility rediscovers the browser WebSocket URL each run.
+The runner uses the shared connection utility to start Chrome Dev automatically when CDP is unavailable and wait up to 20 seconds for readiness. The launch preserves the configured profile and restores its previous session. It then calls `localBrowser.connect({ cdpUrl, extensionId })` and `Stagehand.create({ browser })`. The connection utility loads the installed extension if needed and reuses its ID afterward. This avoids reloading the extension on every sequential attachment. The automatic launch includes `--enable-unsafe-extension-debugging`. The HTTP CDP origin remains stable; the utility rediscovers the browser WebSocket URL each run.
 
 For standalone exploration probes, use `connectBrowser` from utils/browser.ts, close only `stagehand` in finally, and exit the process so its remaining transport cannot hold the probe open. Keep these probes separate from the production runner's latest status. Always preserve Chrome and unrelated tabs. In the pinned SDK, `browser.close()` closes the attached Chrome process; do not call it.
 

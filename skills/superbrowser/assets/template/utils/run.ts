@@ -119,7 +119,7 @@ export async function runScript(options: RunOptions, work: (run: RunContext) => 
   status("running", null);
   log("run_started");
   try {
-    connection = await connectBrowser({ model: options.model }, () => log("stale_session_recovered"));
+    connection = await connectBrowser({ model: options.model }, () => log("stale_session_recovered"), event => log(event));
     const run: RunContext = {
       ...connection, scriptDir, log,
       async step(name, action) { currentStep = name; status("running", null); log("step_started"); const value = await action(); log("step_finished"); return value; },

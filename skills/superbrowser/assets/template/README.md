@@ -8,7 +8,7 @@ This is the shared home for browser automation scripts and utilities. Agents sho
 
 ## Run a script
 
-Chrome Dev must already be running with local CDP and the persistent Superbrowser profile. Run one browser script at a time.
+The shared connection utility starts Chrome Dev automatically when needed, using local CDP and the persistent Superbrowser profile, and waits up to 20 seconds for readiness. Chrome stays open after the script exits. Run one browser script at a time.
 
 ```sh
 bun scripts/example/main.ts

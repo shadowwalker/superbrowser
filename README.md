@@ -43,7 +43,7 @@ repair the script, and verify it works again.
 
 Each script keeps its original goal, usage instructions, configuration, exploration notes, and run logs. Expired sign-in produces a notification and an authentication status. After you sign in, the next manual or scheduled run resumes.
 
-Run one automation at a time against the shared browser. Scheduling and unattended agent repair require a configured scheduler or agent integration; your agent can help set those up.
+Run one automation at a time against the shared browser. If Chrome Dev is stopped, the shared connection utility starts it automatically with your persistent profile and waits for readiness. Chrome stays open after the script exits. Scheduling and unattended agent repair require a configured scheduler or agent integration; your agent can help set those up.
 
 ## Your automation workspace
 

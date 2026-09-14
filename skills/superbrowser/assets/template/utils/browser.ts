@@ -2,31 +2,8 @@ import { localBrowser, Stagehand, type StagehandCreateOptions } from "@browserba
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFile, realpath } from "node:fs/promises";
-
-export class BrowserUnavailableError extends Error {}
-
-export function cdpOrigin() {
-  const url = new URL(process.env.SUPER_BROWSER_CDP_URL || "http://127.0.0.1:9222");
-  if (url.protocol !== "http:" || !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) ||
-      url.username || url.password || url.pathname !== "/" || url.search || url.hash) {
-    throw new Error("SUPER_BROWSER_CDP_URL must be a local HTTP origin");
-  }
-  return url.origin;
-}
-
-export async function browserInfo() {
-  const origin = cdpOrigin();
-  try {
-    const response = await fetch(`${origin}/json/version`, { signal: AbortSignal.timeout(2000) });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const info = await response.json();
-    const socketUrl = new URL(info.webSocketDebuggerUrl);
-    if (socketUrl.protocol !== "ws:" || !["127.0.0.1", "localhost", "[::1]"].includes(socketUrl.hostname)) throw new Error("Expected a local browser WebSocket");
-    return { origin, socketUrl: socketUrl.href };
-  } catch {
-    throw new BrowserUnavailableError(`Chrome Dev is unavailable at ${origin}. Start the shared browser using the skill's setup reference`);
-  }
-}
+import { BrowserUnavailableError, browserInfo, type BrowserStartupEvent } from "./chrome.js";
+export { BrowserUnavailableError, browserInfo, cdpOrigin } from "./chrome.js";
 
 // Small preflight connection. It never controls tabs or closes Chrome.
 async function extensionId(socketUrl: string, reset = false) {
@@ -74,8 +51,8 @@ async function extensionId(socketUrl: string, reset = false) {
   }
 }
 
-export async function connectBrowser(options: Omit<StagehandCreateOptions, "browser"> = {}, onRecovery?: () => void) {
-  const { origin, socketUrl } = await browserInfo();
+export async function connectBrowser(options: Omit<StagehandCreateOptions, "browser"> = {}, onRecovery?: () => void, onStartup?: (event: BrowserStartupEvent) => void) {
+  const { origin, socketUrl } = await browserInfo(onStartup);
   for (let attempt = 0; attempt < 2; attempt++) {
     const browser = await localBrowser.connect({ cdpUrl: origin, extensionId: await extensionId(socketUrl, attempt === 1) });
     try {
